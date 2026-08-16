@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Achievements — Elytra</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<div class="page">
+  <h1>🏅 Achievements</h1>
+  <p class="subtitle" id="ach-summary">0 of 0 unlocked</p>
+
+  <div class="grid section" id="badge-grid"></div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  const state = Elytra.boot("achievements");
+
+  document.getElementById("ach-summary").textContent =
+    `${state.unlockedAchievements.length} of ${Elytra.ACHIEVEMENTS.length} unlocked`;
+
+  const grid = document.getElementById("badge-grid");
+  Elytra.ACHIEVEMENTS.forEach(a => {
+    const unlocked = state.unlockedAchievements.includes(a.id);
+    const el = document.createElement("div");
+    el.className = "badge" + (unlocked ? "" : " locked");
+    el.innerHTML = `
+      <div class="badge-icon">${a.icon}</div>
+      <div class="badge-title">${a.title}</div>
+      <div class="badge-desc">${unlocked ? a.desc : "Locked — " + a.desc}</div>
+    `;
+    grid.appendChild(el);
+  });
+</script>
+</body>
+</html>

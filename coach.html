@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>AI Coach — Elytra</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<div class="page">
+  <h1>🤖 AI Coach</h1>
+  <p class="subtitle">Ask a question and get a demo explanation. This is canned content for the prototype, not a live model call.</p>
+
+  <div class="card section">
+    <div class="field">
+      <label for="coach-input">Ask anything</label>
+      <textarea id="coach-input" placeholder="e.g. Why is the sky blue?"></textarea>
+    </div>
+    <button class="btn btn-primary" id="ask-btn">Ask AI Coach</button>
+    <div class="card hidden" id="coach-reply" style="margin-top:14px; background:var(--surface-alt);"></div>
+  </div>
+
+  <div class="card section">
+    <h3>Suggested next topics</h3>
+    <p class="muted" style="font-size:13px;">Based on your current progress.</p>
+    <div id="suggestions" class="grid" style="margin-top:12px;"></div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  const state = Elytra.boot("coach");
+
+  const REPLIES = [
+    "Good question! Think of it like breaking a big idea into small steps — start with the definition, then look at one real example, then try explaining it back in your own words.",
+    "Here's a simple way to picture it: imagine explaining this to a friend who's never heard of the topic. What's the one sentence that captures the core idea?",
+    "That's a common sticking point. The trick is usually to connect it to something familiar — once you find the analogy, the rest tends to click.",
+  ];
+
+  document.getElementById("ask-btn").addEventListener("click", () => {
+    const q = document.getElementById("coach-input").value.trim();
+    if (!q) { Elytra.toast("Type a question first."); return; }
+    const reply = document.getElementById("coach-reply");
+    reply.classList.remove("hidden");
+    reply.textContent = REPLIES[Math.floor(Math.random() * REPLIES.length)];
+    Elytra.completeQuest("q_ask_coach");
+  });
+
+  const suggestions = [];
+  if (!state.completedLessons.includes("electricity")) {
+    suggestions.push({ title: "Finish Electricity", desc: "You haven't completed this lesson yet.", href: "electricity.html", icon: "⚡" });
+  } else if (!(state.quizScores.electricity >= 80)) {
+    suggestions.push({ title: "Retake the Electricity quiz", desc: "Aim for 80%+ to master this topic.", href: "electricity.html", icon: "📝" });
+  }
+  if (state.doubtsPosted === 0) {
+    suggestions.push({ title: "Post your first doubt", desc: "Ask something you're unsure about.", href: "doubts.html", icon: "💬" });
+  }
+  if (state.questsDone.length < Elytra.QUESTS.length) {
+    suggestions.push({ title: "Clear a quest", desc: "Pick up quick XP in Quests.", href: "quests.html", icon: "🎯" });
+  }
+  if (suggestions.length === 0) {
+    suggestions.push({ title: "Explore Science", desc: "Check out other subjects in Learn.", href: "learn.html", icon: "📘" });
+  }
+
+  const host = document.getElementById("suggestions");
+  suggestions.forEach(s => {
+    const a = document.createElement("a");
+    a.className = "card card-link";
+    a.href = s.href;
+    a.innerHTML = `<span class="card-icon">${s.icon}</span><p class="card-title">${s.title}</p><p class="card-desc">${s.desc}</p>`;
+    host.appendChild(a);
+  });
+</script>
+</body>
+</html>

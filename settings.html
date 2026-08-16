@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Settings — Elytra</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<div class="page">
+  <h1>⚙️ Settings</h1>
+  <p class="subtitle">Demo preferences. Everything here is stored locally in your browser.</p>
+
+  <div class="card section">
+    <div class="flex-between" style="margin-bottom:18px;">
+      <div>
+        <strong>Dark theme</strong>
+        <div class="muted" style="font-size:13px;">Switch between light and dark mode.</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="theme-switch">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="flex-between">
+      <div>
+        <strong>Notifications</strong>
+        <div class="muted" style="font-size:13px;">Demo toggle — no real notifications are sent.</div>
+      </div>
+      <label class="switch">
+        <input type="checkbox" id="notif-switch">
+        <span class="slider"></span>
+      </label>
+    </div>
+  </div>
+
+  <div class="card section">
+    <strong>Reset demo data</strong>
+    <p class="muted" style="font-size:13px;">Clears your XP, streak, quests, achievements and doubts, and signs you out.</p>
+    <button class="btn btn-danger" id="reset-btn">Reset all demo data</button>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  const state = Elytra.boot("settings");
+
+  const themeSwitch = document.getElementById("theme-switch");
+  const notifSwitch = document.getElementById("notif-switch");
+  themeSwitch.checked = state.settings.theme === "dark";
+  notifSwitch.checked = state.settings.notifications;
+
+  themeSwitch.addEventListener("change", () => {
+    Elytra.toggleTheme();
+    Elytra.toast(`Theme set to ${Elytra.getState().settings.theme}`);
+  });
+
+  notifSwitch.addEventListener("change", () => {
+    const s = Elytra.getState();
+    s.settings.notifications = notifSwitch.checked;
+    Elytra.patchState(s);
+    Elytra.toast(`Notifications ${notifSwitch.checked ? "enabled" : "disabled"}`);
+  });
+
+  document.getElementById("reset-btn").addEventListener("click", () => {
+    if (confirm("This clears all demo progress. Continue?")) {
+      Elytra.resetDemoData();
+      window.location.href = "index.html";
+    }
+  });
+</script>
+</body>
+</html>

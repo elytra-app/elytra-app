@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Progress — Elytra</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<div class="page">
+  <h1>📈 Progress</h1>
+  <p class="subtitle">Your XP, streak and subject mastery at a glance.</p>
+
+  <div class="grid section">
+    <div class="card stat-card">
+      <div class="stat-value" id="p-level">1</div>
+      <div class="stat-label">Level</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value" id="p-xp">0</div>
+      <div class="stat-label">Total XP this level</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value" id="p-streak">0</div>
+      <div class="stat-label">Day streak</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value" id="p-quests">0/0</div>
+      <div class="stat-label">Quests complete</div>
+    </div>
+  </div>
+
+  <div class="card section">
+    <h3>Subject mastery</h3>
+    <div id="mastery-list"></div>
+  </div>
+
+  <div class="card section">
+    <h3>Learning statistics</h3>
+    <div class="grid">
+      <div><div class="stat-value" id="s-lessons" style="font-size:22px;">0</div><div class="stat-label">Lessons completed</div></div>
+      <div><div class="stat-value" id="s-doubts-posted" style="font-size:22px;">0</div><div class="stat-label">Doubts posted</div></div>
+      <div><div class="stat-value" id="s-doubts-helped" style="font-size:22px;">0</div><div class="stat-label">Students helped</div></div>
+      <div><div class="stat-value" id="s-badges" style="font-size:22px;">0</div><div class="stat-label">Achievements</div></div>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  const state = Elytra.boot("progress");
+
+  document.getElementById("p-level").textContent = state.level;
+  document.getElementById("p-xp").textContent = `${state.xp}/${Elytra.xpForLevel(state.level)}`;
+  document.getElementById("p-streak").textContent = `${state.streak} 🔥`;
+  document.getElementById("p-quests").textContent = `${state.questsDone.length}/${Elytra.QUESTS.length}`;
+
+  document.getElementById("s-lessons").textContent = state.completedLessons.length;
+  document.getElementById("s-doubts-posted").textContent = state.doubtsPosted;
+  document.getElementById("s-doubts-helped").textContent = state.doubtsHelped;
+  document.getElementById("s-badges").textContent = `${state.unlockedAchievements.length}/${Elytra.ACHIEVEMENTS.length}`;
+
+  const subjects = [
+    { name: "Electricity", key: "electricity" },
+    { name: "Science (overall)", key: null }, // placeholder, no dedicated lesson yet
+  ];
+
+  const masteryHost = document.getElementById("mastery-list");
+  subjects.forEach(subj => {
+    let pct = 0;
+    if (subj.key) {
+      const started = state.completedLessons.includes(subj.key) ? 50 : 0;
+      const quiz = state.quizScores[subj.key] || 0;
+      pct = Math.min(100, started + quiz / 2);
+    }
+    const row = document.createElement("div");
+    row.style.marginBottom = "14px";
+    row.innerHTML = `
+      <div class="flex-between" style="margin-bottom:4px;">
+        <span>${subj.name}</span><span class="muted">${Math.round(pct)}%</span>
+      </div>
+      <div class="bar-track"><div class="bar-fill" style="width:${pct}%;"></div></div>
+    `;
+    masteryHost.appendChild(row);
+  });
+</script>
+</body>
+</html>

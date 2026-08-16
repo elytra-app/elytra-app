@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quests — Elytra</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<div class="page">
+  <h1>🎯 Quests</h1>
+  <p class="subtitle">Most quests complete themselves automatically as you use Elytra. A couple can be checked off manually here for the demo.</p>
+
+  <div class="flex-between section">
+    <div>
+      <strong id="quest-count">0/0</strong> <span class="muted">quests complete</span>
+    </div>
+    <div class="bar-track" style="width:200px;"><div class="bar-fill" id="quest-bar" style="width:0%;"></div></div>
+  </div>
+
+  <div id="quest-list" class="section"></div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  const s = Elytra.boot("quests");
+
+  // Quests that make sense to trigger manually in a demo (others are earned
+  // automatically elsewhere: first lesson, quiz 80%, post doubt, help peer, streak).
+  const MANUAL = new Set(["q_ask_coach"]);
+
+  function render() {
+    const state = Elytra.getState();
+    const list = document.getElementById("quest-list");
+    list.innerHTML = "";
+
+    Elytra.QUESTS.forEach(q => {
+      const done = state.questsDone.includes(q.id);
+      const row = document.createElement("div");
+      row.className = "list-item flex-between";
+      row.innerHTML = `
+        <div>
+          <div style="font-weight:600;">${done ? "✅" : "⬜"} ${q.title}</div>
+          <div class="muted" style="font-size:13px;">${q.hint} · +${q.xp} XP</div>
+        </div>
+        ${MANUAL.has(q.id) && !done
+          ? `<button class="btn btn-primary btn-sm" data-quest="${q.id}">Mark done</button>`
+          : `<span class="tag">${done ? "Done" : "Auto-tracked"}</span>`}
+      `;
+      list.appendChild(row);
+    });
+
+    document.getElementById("quest-count").textContent = `${state.questsDone.length}/${Elytra.QUESTS.length}`;
+    document.getElementById("quest-bar").style.width =
+      (state.questsDone.length / Elytra.QUESTS.length) * 100 + "%";
+
+    list.querySelectorAll("[data-quest]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        Elytra.completeQuest(btn.dataset.quest);
+        render();
+      });
+    });
+  }
+
+  render();
+</script>
+</body>
+</html>

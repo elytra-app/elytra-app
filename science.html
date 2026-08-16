@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Science — Elytra</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<div class="page">
+  <p class="muted"><a href="learn.html">← Learn</a></p>
+  <h1>🔬 Science</h1>
+  <p class="subtitle">Core concepts across physics, chemistry and biology.</p>
+
+  <div class="grid section">
+    <a class="card card-link" href="electricity.html">
+      <span class="card-icon">⚡</span>
+      <p class="card-title">Electricity</p>
+      <p class="card-desc">Circuits, current, and everyday electrical safety.</p>
+      <p class="tag" id="electricity-status" style="margin-top:10px; display:inline-block;">Not started</p>
+    </a>
+    <div class="card" style="opacity:.55;">
+      <span class="card-icon">🧪</span>
+      <p class="card-title">States of Matter</p>
+      <p class="card-desc">Coming soon in this demo.</p>
+    </div>
+    <div class="card" style="opacity:.55;">
+      <span class="card-icon">🧬</span>
+      <p class="card-title">Cells &amp; Life</p>
+      <p class="card-desc">Coming soon in this demo.</p>
+    </div>
+    <div class="card" style="opacity:.55;">
+      <span class="card-icon">🪐</span>
+      <p class="card-title">Our Solar System</p>
+      <p class="card-desc">Coming soon in this demo.</p>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  const state = Elytra.boot("learn");
+  const done = state.completedLessons.includes("electricity");
+  const badge = document.getElementById("electricity-status");
+  if (done) {
+    badge.textContent = "✅ Completed" + (state.quizScores.electricity ? ` · ${state.quizScores.electricity}%` : "");
+  }
+</script>
+</body>
+</html>

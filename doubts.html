@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Doubt Hub — Elytra</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<div class="page">
+  <h1>💬 Doubt Hub</h1>
+  <p class="subtitle">Ask a question, or help another student and earn +20 XP.</p>
+
+  <div class="card section">
+    <h3>Post a doubt</h3>
+    <form id="doubt-form">
+      <div class="field">
+        <label for="d-subject">Subject</label>
+        <select id="d-subject">
+          <option>Science</option>
+          <option>Electricity</option>
+          <option>Mathematics</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="field">
+        <label for="d-text">Your question</label>
+        <textarea id="d-text" placeholder="What are you stuck on?"></textarea>
+      </div>
+      <button class="btn btn-primary" type="submit">Post doubt</button>
+    </form>
+  </div>
+
+  <div class="section flex-between">
+    <h3 style="margin:0;">All doubts</h3>
+    <input type="text" id="filter" placeholder="Filter by subject or keyword" style="max-width:240px;">
+  </div>
+  <div id="doubt-list" class="section" style="margin-top:8px;"></div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  Elytra.boot("doubts");
+
+  function render() {
+    const state = Elytra.getState();
+    const q = document.getElementById("filter").value.trim().toLowerCase();
+    const list = document.getElementById("doubt-list");
+    list.innerHTML = "";
+
+    const filtered = state.doubts.filter(d =>
+      !q || d.subject.toLowerCase().includes(q) || d.text.toLowerCase().includes(q)
+    );
+
+    if (filtered.length === 0) {
+      list.innerHTML = `<p class="muted">No doubts match that filter.</p>`;
+      return;
+    }
+
+    filtered.forEach(d => {
+      const row = document.createElement("div");
+      row.className = "list-item";
+      row.innerHTML = `
+        <div class="list-item-head">
+          <span class="tag">${d.subject}</span>
+          <span class="muted" style="font-size:12px;">${d.author}</span>
+        </div>
+        <p style="margin:0 0 8px;">${d.text}</p>
+        <div class="flex-between">
+          <span class="muted" style="font-size:12px;">${d.replies} repl${d.replies === 1 ? "y" : "ies"}</span>
+          ${d.helped
+            ? `<span class="tag">✅ Helped</span>`
+            : `<button class="btn btn-outline btn-sm" data-help="${d.id}">Help this student (+20 XP)</button>`}
+        </div>
+      `;
+      list.appendChild(row);
+    });
+
+    list.querySelectorAll("[data-help]").forEach(btn => {
+      btn.addEventListener("click", () => {
+        Elytra.helpDoubt(btn.dataset.help);
+        render();
+      });
+    });
+  }
+
+  document.getElementById("doubt-form").addEventListener("submit", e => {
+    e.preventDefault();
+    const subject = document.getElementById("d-subject").value;
+    const text = document.getElementById("d-text").value.trim();
+    if (!text) { Elytra.toast("Write your question first."); return; }
+    Elytra.postDoubt(subject, text);
+    document.getElementById("d-text").value = "";
+    render();
+  });
+
+  document.getElementById("filter").addEventListener("input", render);
+
+  render();
+</script>
+</body>
+</html>

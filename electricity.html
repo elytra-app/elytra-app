@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Electricity — Elytra</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<div class="page">
+  <p class="muted"><a href="science.html">← Science</a></p>
+  <h1>⚡ Electricity</h1>
+  <p class="subtitle">Circuits, current, and everyday electrical safety.</p>
+
+  <div class="card section">
+    <div style="background:var(--surface-alt); border-radius:var(--radius-sm); aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; font-size:40px;">
+      ▶️
+    </div>
+    <p class="muted" style="font-size:13px; margin-top:8px;">Demo video placeholder — "What is electric current?" (4:12)</p>
+
+    <h3>Key ideas</h3>
+    <ul>
+      <li><strong>Current</strong> is the flow of electric charge through a conductor, measured in amperes (A).</li>
+      <li><strong>Voltage</strong> is the "push" that drives current, measured in volts (V).</li>
+      <li><strong>Resistance</strong> opposes current flow, measured in ohms (Ω).</li>
+      <li>In a <strong>series circuit</strong>, current is the same everywhere but voltage splits across components.</li>
+      <li>In a <strong>parallel circuit</strong>, voltage is the same across each branch but current splits.</li>
+    </ul>
+
+    <button class="btn btn-primary" id="complete-btn">✅ Mark lesson complete</button>
+    <span class="tag" id="complete-status" style="margin-left:10px;"></span>
+  </div>
+
+  <div class="card section">
+    <h3>🤖 Ask for an AI explanation</h3>
+    <p class="muted" style="font-size:13px;">Pick something you're stuck on — this is a canned demo response, not a live model.</p>
+    <div style="display:flex; gap:8px; flex-wrap:wrap; margin:12px 0;">
+      <button class="btn btn-outline btn-sm" data-topic="current">Current</button>
+      <button class="btn btn-outline btn-sm" data-topic="voltage">Voltage</button>
+      <button class="btn btn-outline btn-sm" data-topic="series">Series vs parallel</button>
+      <button class="btn btn-outline btn-sm" data-topic="fuse">Fuses &amp; safety</button>
+    </div>
+    <div class="card" id="explain-box" style="background:var(--surface-alt); display:none;"></div>
+  </div>
+
+  <div class="card section">
+    <h3>Quick quiz</h3>
+    <form id="quiz-form">
+      <div class="field">
+        <label>1. What is measured in amperes?</label>
+        <select name="q1">
+          <option value="">Choose one</option>
+          <option value="wrong">Voltage</option>
+          <option value="right">Current</option>
+          <option value="wrong">Resistance</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>2. In a series circuit, what stays the same throughout?</label>
+        <select name="q2">
+          <option value="">Choose one</option>
+          <option value="right">Current</option>
+          <option value="wrong">Voltage</option>
+          <option value="wrong">Resistance</option>
+        </select>
+      </div>
+      <div class="field">
+        <label>3. What does a fuse do?</label>
+        <select name="q3">
+          <option value="">Choose one</option>
+          <option value="wrong">Increases current</option>
+          <option value="wrong">Stores charge</option>
+          <option value="right">Breaks the circuit if current is too high</option>
+        </select>
+      </div>
+      <button class="btn btn-primary" type="submit">Submit quiz</button>
+    </form>
+    <div class="card hidden" id="quiz-result" style="margin-top:14px;"></div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  const state = Elytra.boot("learn");
+
+  function refreshCompleteUI() {
+    const s = Elytra.getState();
+    const done = s.completedLessons.includes("electricity");
+    document.getElementById("complete-btn").disabled = done;
+    document.getElementById("complete-status").textContent = done ? "✅ Completed" : "Not started";
+  }
+  refreshCompleteUI();
+
+  document.getElementById("complete-btn").addEventListener("click", () => {
+    Elytra.completeLesson("electricity");
+    Elytra.addXP(30, "Electricity lesson complete");
+    refreshCompleteUI();
+  });
+
+  const explanations = {
+    current: "Think of current like water flowing through a pipe. The pipe is the wire, and the flowing water is the moving electric charge. More current = more water passing a point each second.",
+    voltage: "Voltage is like water pressure pushing that water through the pipe. Higher voltage pushes charge through a circuit harder, which usually means more current (for the same resistance).",
+    series: "In series, everything is on one single loop — remove one bulb and the whole circuit breaks. In parallel, each bulb has its own path back to the source, so one going out doesn't affect the others.",
+    fuse: "A fuse contains a thin wire that melts and breaks the circuit if too much current flows — protecting your wiring and appliances from overheating or fire."
+  };
+
+  document.querySelectorAll("[data-topic]").forEach(btn => {
+    btn.addEventListener("click", () => {
+      const box = document.getElementById("explain-box");
+      box.style.display = "block";
+      box.textContent = explanations[btn.dataset.topic];
+    });
+  });
+
+  document.getElementById("quiz-form").addEventListener("submit", e => {
+    e.preventDefault();
+    const form = e.target;
+    const answers = ["q1", "q2", "q3"].map(name => form[name].value);
+    if (answers.includes("")) { Elytra.toast("Answer every question first."); return; }
+    const correct = answers.filter(a => a === "right").length;
+    const score = Math.round((correct / answers.length) * 100);
+
+    Elytra.recordQuizScore("electricity", score);
+    Elytra.addXP(10 * correct, "Electricity quiz");
+
+    const result = document.getElementById("quiz-result");
+    result.classList.remove("hidden");
+    result.innerHTML = `<strong>${score}%</strong> — ${correct}/${answers.length} correct.` +
+      (score >= 80 ? " Great work! 🎉" : " Review the key ideas above and try again anytime.");
+  });
+</script>
+</body>
+</html>

@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Elytra — Learn, Level Up, Take Flight</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="login-wrap">
+  <div class="card login-card">
+    <img class="login-logo" src="assets/logo.png" alt="Elytra logo">
+    <h1>Elytra</h1>
+    <p class="subtitle">Learn. Level up. Take flight.</p>
+
+    <div class="field" style="text-align:left; margin-top:20px;">
+      <label for="name-input">What should we call you?</label>
+      <input type="text" id="name-input" placeholder="e.g. Aarav" maxlength="24">
+    </div>
+
+    <button class="btn btn-primary" id="login-btn" style="width:100%; justify-content:center;">
+      🚀 Start demo
+    </button>
+    <p class="muted" style="font-size:12px; margin-top:14px;">
+      This is a demo. Your progress is saved only in this browser (localStorage) —
+      no account or server required.
+    </p>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  Elytra.boot(null, { public: true });
+
+  // If already logged in, skip straight to dashboard.
+  if (Elytra.getState().loggedIn) {
+    window.location.href = "dashboard.html";
+  }
+
+  const input = document.getElementById("name-input");
+  const state = Elytra.getState();
+  if (state.name && state.name !== "Explorer") input.value = state.name;
+
+  function go() {
+    Elytra.login(input.value);
+    window.location.href = "dashboard.html";
+  }
+
+  document.getElementById("login-btn").addEventListener("click", go);
+  input.addEventListener("keydown", e => { if (e.key === "Enter") go(); });
+</script>
+</body>
+</html>

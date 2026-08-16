@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Profile — Elytra</title>
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div id="app-nav"></div>
+
+<div class="page">
+  <h1>🧑‍🚀 Profile</h1>
+  <p class="subtitle">Your student information for this demo.</p>
+
+  <div class="card section">
+    <div class="field">
+      <label for="p-name">Display name</label>
+      <input type="text" id="p-name" maxlength="24">
+    </div>
+    <button class="btn btn-primary btn-sm" id="save-name">Save</button>
+  </div>
+
+  <div class="grid section">
+    <div class="card stat-card">
+      <div class="stat-value" id="p-level">1</div>
+      <div class="stat-label">Level</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value" id="p-xp">0</div>
+      <div class="stat-label">XP to next level</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value" id="p-streak">0</div>
+      <div class="stat-label">Day streak</div>
+    </div>
+    <div class="card stat-card">
+      <div class="stat-value" id="p-badges">0</div>
+      <div class="stat-label">Achievements</div>
+    </div>
+  </div>
+</div>
+
+<script src="js/app.js"></script>
+<script>
+  const state = Elytra.boot("profile");
+
+  document.getElementById("p-name").value = state.name;
+  document.getElementById("p-level").textContent = state.level;
+  document.getElementById("p-xp").textContent = `${state.xp}/${Elytra.xpForLevel(state.level)}`;
+  document.getElementById("p-streak").textContent = `${state.streak} 🔥`;
+  document.getElementById("p-badges").textContent = `${state.unlockedAchievements.length}/${Elytra.ACHIEVEMENTS.length}`;
+
+  document.getElementById("save-name").addEventListener("click", () => {
+    const name = document.getElementById("p-name").value.trim();
+    if (!name) { Elytra.toast("Name can't be empty."); return; }
+    Elytra.patchState({ name });
+    Elytra.toast("Profile updated");
+    Elytra.renderNav("profile");
+  });
+</script>
+</body>
+</html>
